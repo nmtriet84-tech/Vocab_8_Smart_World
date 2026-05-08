@@ -1,0 +1,1311 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vocabulary Quest - English 8</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #5d6673;
+      --paper: #f7f9ed;
+      --panel: #ffffff;
+      --line: #17202a24;
+      --green: #2f9e6d;
+      --blue: #2563eb;
+      --coral: #ff6b4a;
+      --gold: #f2b705;
+      --red: #df3f40;
+      --shadow: 0 22px 60px #17202a24;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(120deg, #f7f9ed 0%, #ecf7ff 48%, #fff2ea 100%);
+    }
+
+    button, input, select { font: inherit; }
+
+    .app {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 22px 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .screen { display: none; width: 100%; }
+    .screen.active { display: block; }
+
+    .shell {
+      background: #fffffff2;
+      border: 2px solid #17202a;
+      border-radius: 8px;
+      box-shadow: 8px 8px 0 #17202a;
+      overflow: hidden;
+    }
+
+    .start {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(310px, .95fr);
+      gap: 0;
+      min-height: min(760px, calc(100vh - 44px));
+    }
+
+    .intro {
+      padding: clamp(24px, 5vw, 54px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 22px;
+      border-right: 2px solid var(--line);
+    }
+
+    .eyebrow {
+      width: fit-content;
+      padding: 8px 12px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: var(--gold);
+      font-weight: 900;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 700px;
+      font-size: clamp(42px, 7vw, 82px);
+      line-height: .96;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 660px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(17px, 2.3vw, 22px);
+      line-height: 1.45;
+      font-weight: 680;
+    }
+
+    .word-wall {
+      min-height: 100%;
+      padding: clamp(22px, 4vw, 42px);
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      background: #e9f7f0;
+    }
+
+    .word-card {
+      min-height: 92px;
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .word-card:nth-child(2) { background: #fff7d8; }
+    .word-card:nth-child(3) { background: #edf2ff; }
+
+    .tile {
+      width: 54px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--coral);
+      color: #fff;
+      font-size: 28px;
+      font-weight: 950;
+    }
+
+    .word-card strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .word-card span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-weight: 750;
+    }
+
+    .setup {
+      display: grid;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    label, .label {
+      font-size: 14px;
+      font-weight: 900;
+      color: #394554;
+    }
+
+    .input, .select {
+      width: 100%;
+      min-height: 54px;
+      padding: 0 15px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      outline: none;
+      font-weight: 800;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    .input:focus, .select:focus { border-color: var(--blue); }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .choice {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      font-weight: 850;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .choice input { accent-color: var(--green); }
+
+    .unit-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .unit-card {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 2px 2px 0 var(--ink);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .unit-card:has(input:checked) {
+      background: #e8f7ef;
+      border-color: var(--green);
+    }
+
+    .unit-card input {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--green);
+    }
+
+    .unit-card strong {
+      display: block;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .unit-card span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 780;
+      line-height: 1.25;
+    }
+
+    .btn {
+      min-height: 50px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      padding: 0 17px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 950;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .btn.primary { background: var(--green); color: #061811; }
+    .btn.blue { background: var(--blue); }
+    .btn.coral { background: var(--coral); color: #1d0802; }
+    .btn.ghost { background: #fff; color: var(--ink); }
+
+    .start-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .leaderboard {
+      padding: 18px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .leaderboard h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .leader-row {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 0;
+      border-top: 1px solid var(--line);
+      font-weight: 850;
+    }
+
+    .rank {
+      width: 32px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--gold);
+      border: 2px solid var(--ink);
+      font-weight: 950;
+    }
+
+    .small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .quiz {
+      min-height: min(760px, calc(100vh - 44px));
+      padding: clamp(16px, 3vw, 28px);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto auto;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .pill {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: #fff;
+      font-weight: 900;
+      box-shadow: 2px 2px 0 var(--ink);
+      white-space: nowrap;
+    }
+
+    .timer {
+      min-width: 76px;
+      background: conic-gradient(var(--coral) var(--angle), #e9edf3 0);
+      color: var(--ink);
+    }
+
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .question-card, .side-card, .review-card {
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+
+    .question-card {
+      min-height: 540px;
+      padding: clamp(20px, 4vw, 36px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #edf2ff;
+      color: #273a63;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .tag.level { background: #fff1cc; color: #5a4000; }
+    .tag.type { background: #e8f7ef; color: #123c2a; }
+
+    .question-text {
+      margin: 0;
+      font-size: clamp(26px, 4.2vw, 44px);
+      line-height: 1.18;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    .options {
+      display: grid;
+      gap: 11px;
+    }
+
+    .option {
+      width: 100%;
+      min-height: 62px;
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-weight: 850;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+
+    .option:hover { background: #f1fff8; }
+    .option.correct { background: #dff8eb; border-color: var(--green); }
+    .option.wrong { background: #ffe4de; border-color: var(--red); }
+    .option[disabled] { cursor: default; }
+
+    .key {
+      width: 34px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--ink);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .feedback {
+      min-height: 54px;
+      padding: 12px 14px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: var(--muted);
+      font-weight: 780;
+      line-height: 1.4;
+    }
+
+    .feedback.good { color: #0d5f3d; background: #e8f7ef; border-color: #93d7b8; }
+    .feedback.bad { color: #8d241d; background: #ffe9e5; border-color: #ffb6a7; }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .side {
+      display: grid;
+      gap: 12px;
+    }
+
+    .side-card {
+      padding: 16px;
+    }
+
+    .side-card strong {
+      display: block;
+      font-size: 32px;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .bar {
+      height: 12px;
+      margin-top: 12px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .bar span {
+      display: block;
+      width: var(--w);
+      height: 100%;
+      background: linear-gradient(90deg, var(--coral), var(--gold), var(--green));
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: #0d1320cc;
+      z-index: 20;
+      padding: 18px;
+    }
+
+    .modal-backdrop.active { display: grid; }
+
+    .modal {
+      width: min(780px, 100%);
+      max-height: min(760px, calc(100vh - 36px));
+      overflow: auto;
+      padding: clamp(22px, 4vw, 34px);
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 7px 7px 0 var(--ink);
+    }
+
+    .modal h2 {
+      margin: 0 0 8px;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1;
+    }
+
+    .result-grid, .review-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .box {
+      padding: 15px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: #f8fafc;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .box.good { background: #e8f7ef; border-color: var(--green); }
+    .box.bad { background: #ffe9e5; border-color: var(--red); }
+
+    .history {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid var(--ink);
+      font-size: 14px;
+      background: #fff;
+    }
+
+    .history th, .history td {
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-weight: 780;
+    }
+
+    .history th { background: #fff1cc; }
+
+    .review {
+      min-height: min(760px, calc(100vh - 44px));
+      padding: clamp(16px, 3vw, 28px);
+    }
+
+    .review-card {
+      min-height: 560px;
+      padding: clamp(20px, 4vw, 36px);
+      display: grid;
+      gap: 18px;
+    }
+
+    .empty {
+      padding: 14px;
+      border: 2px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      max-width: min(560px, calc(100% - 28px));
+      padding: 12px 15px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 850;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 30;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, -4px);
+    }
+
+    @media (max-width: 900px) {
+      .start, .quiz-layout { grid-template-columns: 1fr; }
+      .intro { border-right: 0; border-bottom: 2px solid var(--line); }
+      .word-wall { min-height: auto; }
+      .topbar { grid-template-columns: 1fr 1fr; }
+      .topbar .pill:first-child { grid-column: 1 / -1; }
+      .side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .app { width: min(100% - 14px, 1180px); padding: 8px 0; }
+      .shell { box-shadow: 4px 4px 0 var(--ink); }
+      .check-grid, .side, .result-grid, .review-grid { grid-template-columns: 1fr; }
+      .topbar { grid-template-columns: 1fr; }
+      .question-card, .review-card { min-height: auto; }
+      .question-text { font-size: 25px; }
+      .start-actions .btn, .actions .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section id="startScreen" class="screen active">
+      <div class="shell start">
+        <div class="intro">
+          <span class="eyebrow">English 8 Vocabulary Quest</span>
+          <h1>Luyện từ vựng theo Unit</h1>
+          <p class="lede">Chọn chủ đề, vào trận quiz 4 lựa chọn, luyện nghĩa, phiên âm, từ loại và câu điền từ. Sai thì xem giải thích ngay, đúng thì giữ nhịp tiếp tục.</p>
+
+          <form id="startForm" class="setup">
+            <div class="field">
+              <label for="nicknameInput">Nickname</label>
+              <input id="nicknameInput" class="input" maxlength="24" autocomplete="nickname" placeholder="Nhập tên học sinh">
+            </div>
+
+            <div class="field">
+              <span class="label">Chọn Unit</span>
+              <div id="unitChoices" class="unit-list"></div>
+            </div>
+
+            <div class="start-actions">
+              <button class="btn primary" type="submit">Bắt đầu</button>
+              <button id="selectAllBtn" class="btn ghost" type="button">Tất cả</button>
+            </div>
+          </form>
+
+          <section class="leaderboard" aria-labelledby="leaderTitle">
+            <h2 id="leaderTitle">Top 5 bảng xếp hạng</h2>
+            <div id="leaderboardList" class="empty">Đang tải bảng xếp hạng...</div>
+          </section>
+        </div>
+
+        <aside class="word-wall" aria-hidden="true">
+          <div class="word-card">
+            <span class="tile">W</span>
+            <span><strong>Word</strong><span>Chọn từ đúng theo nghĩa</span></span>
+          </div>
+          <div class="word-card">
+            <span class="tile">/ə/</span>
+            <span><strong>Sound</strong><span>Luyện phiên âm và nhận diện âm</span></span>
+          </div>
+          <div class="word-card">
+            <span class="tile">✓</span>
+            <span><strong>Quest</strong><span>5.120 câu từ Unit 1 đến Unit 8</span></span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="quizScreen" class="screen">
+      <div class="shell quiz">
+        <div class="topbar">
+          <div id="playerPill" class="pill">Player</div>
+          <div class="pill">Câu <span id="questionIndex">1</span>/<span id="totalQuestions">20</span></div>
+          <div class="pill">Điểm <span id="scorePill">0.00</span>/10</div>
+          <div id="timer" class="pill timer" style="--angle: 360deg">60s</div>
+        </div>
+
+        <div class="quiz-layout">
+          <article class="question-card">
+            <div>
+              <div class="meta">
+                <span id="unitTag" class="tag">Unit</span>
+                <span id="levelTag" class="tag level">Level</span>
+                <span id="categoryTag" class="tag type">Type</span>
+              </div>
+              <p id="questionText" class="question-text"></p>
+            </div>
+            <div>
+              <div id="options" class="options"></div>
+              <div id="feedback" class="feedback">Chọn một đáp án để kiểm tra.</div>
+              <div class="actions">
+                <button id="finishBtn" class="btn ghost" type="button">Nộp bài</button>
+                <button id="nextBtn" class="btn blue" type="button" disabled>Câu tiếp</button>
+              </div>
+            </div>
+          </article>
+
+          <aside class="side">
+            <div class="side-card">
+              <strong id="correctStat">0</strong>
+              <span class="small">Câu đúng</span>
+              <div class="bar" style="--w: 0%"><span></span></div>
+            </div>
+            <div class="side-card">
+              <strong id="wrongStat">0</strong>
+              <span class="small">Câu sai</span>
+            </div>
+            <div class="side-card">
+              <strong id="answeredStat">0</strong>
+              <span class="small">Đã trả lời</span>
+            </div>
+            <div class="side-card">
+              <strong id="poolStat">0</strong>
+              <span class="small">Câu trong bộ lọc</span>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="reviewScreen" class="screen">
+      <div class="shell review">
+        <div class="topbar">
+          <div class="pill">Xem lại bài</div>
+          <div class="pill">Câu <span id="reviewIndex">1</span>/<span id="reviewTotal">1</span></div>
+          <button id="backResultBtn" class="btn ghost" type="button">Kết quả</button>
+          <button id="newQuizFromReviewBtn" class="btn coral" type="button">Lượt mới</button>
+        </div>
+        <article class="review-card">
+          <div>
+            <div class="meta">
+              <span id="reviewUnit" class="tag"></span>
+              <span id="reviewLevel" class="tag level"></span>
+              <span id="reviewCategory" class="tag type"></span>
+            </div>
+            <p id="reviewQuestion" class="question-text"></p>
+          </div>
+          <div class="review-grid">
+            <div id="userAnswerBox" class="box"></div>
+            <div id="correctAnswerBox" class="box good"></div>
+          </div>
+          <div id="explanationBox" class="box"></div>
+          <div class="actions">
+            <button id="prevReviewBtn" class="btn ghost" type="button">Trước</button>
+            <button id="nextReviewBtn" class="btn blue" type="button">Sau</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="resultModal" class="modal-backdrop">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+      <h2 id="resultTitle">Kết quả</h2>
+      <p id="resultRemark" class="lede"></p>
+      <div class="result-grid">
+        <div id="finalScoreBox" class="box good"></div>
+        <div id="finalDetailBox" class="box"></div>
+      </div>
+      <h3>Lịch sử trên máy này</h3>
+      <div id="historyWrap"></div>
+      <div class="actions">
+        <button id="reviewBtn" class="btn blue" type="button">Xem lại</button>
+        <button id="newQuizBtn" class="btn coral" type="button">Lượt mới</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAqOQ-fwz5wnt841fO77ytoaB-mWlN55AYlWd2E703FrowzIrfvMNeS8_doIN20XXpCw/exec";
+    const HISTORY_KEY = "english8VocabularyQuest.history.v1";
+    const TIMER_BY_LEVEL = { "Dễ": 45, "Trung bình": 60, "Khá": 70, "Khó": 80 };
+    const LEVELS = ["Dễ", "Trung bình", "Khá", "Khó"];
+    const START_TOTAL = 20;
+    const QUESTIONS_PER_LEVEL = START_TOTAL / LEVELS.length;
+    const EXTRA_ON_WRONG = 2;
+    const UNITS = [
+      { unitNumber: 1, unitTitle: "Free time" },
+      { unitNumber: 2, unitTitle: "Life in the Country" },
+      { unitNumber: 3, unitTitle: "Protecting the Environment" },
+      { unitNumber: 4, unitTitle: "Disasters" },
+      { unitNumber: 5, unitTitle: "Science and Technology" },
+      { unitNumber: 6, unitTitle: "Life on Other Planets" },
+      { unitNumber: 7, unitTitle: "Teens" },
+      { unitNumber: 8, unitTitle: "Traditions of Ethnic Groups in Vietnam" }
+    ];
+
+    const state = {
+      questions: [],
+      filtered: [],
+      queue: [],
+      usedIds: new Set(),
+      nickname: "",
+      currentIndex: 0,
+      answered: [],
+      selected: null,
+      locked: false,
+      correct: 0,
+      wrong: 0,
+      timerId: null,
+      secondsLeft: 60,
+      startedAt: null,
+      lastResult: null,
+      reviewIndex: 0
+    };
+
+    const $ = (id) => document.getElementById(id);
+    const screens = {
+      start: $("startScreen"),
+      quiz: $("quizScreen"),
+      review: $("reviewScreen")
+    };
+
+    init();
+
+    async function init() {
+      bindEvents();
+      renderFilters();
+      try {
+        const response = await fetch("questions.json", { cache: "no-store" });
+        if (!response.ok) throw new Error("Không tải được questions.json");
+        state.questions = await response.json();
+        loadLeaderboard();
+      } catch (error) {
+        toast("Không đọc được questions.json. Hãy mở bằng local server hoặc GitHub Pages.");
+        console.error(error);
+      }
+    }
+
+    function bindEvents() {
+      $("startForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        startQuiz();
+      });
+      $("selectAllBtn").addEventListener("click", selectAllFilters);
+      $("nextBtn").addEventListener("click", nextQuestion);
+      $("finishBtn").addEventListener("click", () => finishQuiz("manual"));
+      $("reviewBtn").addEventListener("click", showReview);
+      $("newQuizBtn").addEventListener("click", newQuiz);
+      $("newQuizFromReviewBtn").addEventListener("click", newQuiz);
+      $("backResultBtn").addEventListener("click", showResultModal);
+      $("prevReviewBtn").addEventListener("click", () => {
+        state.reviewIndex = Math.max(0, state.reviewIndex - 1);
+        renderReview();
+      });
+      $("nextReviewBtn").addEventListener("click", () => {
+        state.reviewIndex = Math.min(state.answered.length - 1, state.reviewIndex + 1);
+        renderReview();
+      });
+    }
+
+    function renderFilters() {
+      $("unitChoices").innerHTML = UNITS.map((unit) => `
+        <label class="unit-card">
+          <input type="checkbox" name="unit" value="${unit.unitNumber}" checked>
+          <span>
+            <strong>Unit ${unit.unitNumber}</strong>
+            <span>${unit.unitTitle}</span>
+          </span>
+        </label>
+      `).join("");
+    }
+
+    function selectAllFilters() {
+      document.querySelectorAll("input[name='unit']").forEach((input) => {
+        input.checked = true;
+      });
+    }
+
+    function startQuiz() {
+      const nickname = $("nicknameInput").value.trim();
+      if (!nickname) {
+        toast("Nhập nickname trước khi bắt đầu.");
+        $("nicknameInput").focus();
+        return;
+      }
+
+      let selectedUnits = selectedUnitValues();
+      if (!selectedUnits.length) {
+        selectedUnits = [...new Set(state.questions.map((question) => question.unitNumber))];
+      }
+      state.filtered = state.questions.filter((question) =>
+        selectedUnits.includes(question.unitNumber)
+      );
+      if (!state.filtered.length) {
+        toast("Không có câu hỏi phù hợp với bộ lọc.");
+        return;
+      }
+
+      state.usedIds = new Set();
+      state.queue = buildInitialQueue();
+      Object.assign(state, {
+        nickname,
+        currentIndex: 0,
+        answered: [],
+        selected: null,
+        locked: false,
+        correct: 0,
+        wrong: 0,
+        startedAt: Date.now(),
+        lastResult: null,
+        reviewIndex: 0
+      });
+
+      $("playerPill").textContent = nickname;
+      showScreen("quiz");
+      renderQuestion();
+    }
+
+    function buildInitialQueue() {
+      const queue = [];
+      LEVELS.forEach((level) => {
+        const pool = state.filtered.filter((question) => question.level === level);
+        takeUnused(pool, QUESTIONS_PER_LEVEL).forEach((question) => queue.push(question));
+      });
+
+      if (queue.length < START_TOTAL) {
+        takeUnused(state.filtered, START_TOTAL - queue.length).forEach((question) => queue.push(question));
+      }
+
+      return shuffle(queue);
+    }
+
+    function addWrongAnswerQuestions(level) {
+      const minLevelIndex = LEVELS.indexOf(level);
+      const pool = state.filtered.filter((question) =>
+        LEVELS.indexOf(question.level) >= minLevelIndex
+      );
+      const added = takeUnused(pool, EXTRA_ON_WRONG);
+      state.queue.push(...added);
+      return added.length;
+    }
+
+    function takeUnused(pool, count) {
+      const picked = [];
+      const candidates = shuffle(pool.filter((question) => !state.usedIds.has(question.id)));
+      for (const question of candidates) {
+        state.usedIds.add(question.id);
+        picked.push(question);
+        if (picked.length >= count) break;
+      }
+      return picked;
+    }
+
+    function renderQuestion() {
+      clearInterval(state.timerId);
+      if (state.currentIndex >= state.queue.length) {
+        finishQuiz("done");
+        return;
+      }
+
+      const question = state.queue[state.currentIndex];
+      state.selected = null;
+      state.locked = false;
+
+      $("questionIndex").textContent = state.currentIndex + 1;
+      $("totalQuestions").textContent = state.queue.length;
+      $("unitTag").textContent = question.unit;
+      $("levelTag").textContent = question.level;
+      $("categoryTag").textContent = question.category;
+      $("questionText").textContent = question.question;
+      $("feedback").className = "feedback";
+      $("feedback").textContent = "Chọn một đáp án để kiểm tra.";
+      $("nextBtn").disabled = true;
+
+      const options = shuffle([...question.options]);
+      $("options").innerHTML = options.map((option, index) => `
+        <button class="option" type="button" data-option="${escapeAttr(option)}">
+          <span class="key">${String.fromCharCode(65 + index)}</span>
+          <span>${escapeHtml(option)}</span>
+        </button>
+      `).join("");
+
+      document.querySelectorAll(".option").forEach((button) => {
+        button.addEventListener("click", () => checkAnswer(button));
+      });
+
+      renderStats();
+      startTimer();
+    }
+
+    function checkAnswer(button, timedOut = false) {
+      if (state.locked) return;
+      clearInterval(state.timerId);
+      state.locked = true;
+
+      const question = state.queue[state.currentIndex];
+      const userAnswer = timedOut ? null : button.dataset.option;
+      const isCorrect = userAnswer === question.answer;
+      let addedCount = 0;
+      if (isCorrect) {
+        state.correct += 1;
+      } else {
+        state.wrong += 1;
+        addedCount = addWrongAnswerQuestions(question.level);
+      }
+
+      document.querySelectorAll(".option").forEach((node) => {
+        node.disabled = true;
+        if (node.dataset.option === question.answer) node.classList.add("correct");
+        if (!timedOut && node === button && !isCorrect) node.classList.add("wrong");
+      });
+
+      state.answered.push({
+        question,
+        userAnswer,
+        isCorrect,
+        timedOut,
+        order: state.currentIndex + 1
+      });
+
+      $("feedback").className = `feedback ${isCorrect ? "good" : "bad"}`;
+      $("feedback").textContent = isCorrect
+        ? `Đúng. ${question.explanation}`
+        : `Chưa đúng. Đáp án là "${question.answer}". Đã thêm ${addedCount} câu cùng hoặc cao hơn level. ${question.explanation}`;
+      $("nextBtn").disabled = false;
+      renderStats();
+    }
+
+    function nextQuestion() {
+      if (!state.locked) return;
+      state.currentIndex += 1;
+      renderQuestion();
+    }
+
+    function startTimer() {
+      const question = state.queue[state.currentIndex];
+      state.secondsLeft = TIMER_BY_LEVEL[question.level] || 60;
+      updateTimer();
+      state.timerId = setInterval(() => {
+        state.secondsLeft -= 1;
+        updateTimer();
+        if (state.secondsLeft <= 0) {
+          const fakeButton = { dataset: { option: null } };
+          checkAnswer(fakeButton, true);
+        }
+      }, 1000);
+    }
+
+    function updateTimer() {
+      const question = state.queue[state.currentIndex];
+      const total = TIMER_BY_LEVEL[question.level] || 60;
+      const ratio = Math.max(0, state.secondsLeft) / total;
+      $("timer").style.setProperty("--angle", `${ratio * 360}deg`);
+      $("timer").textContent = `${Math.max(0, state.secondsLeft)}s`;
+    }
+
+    function renderStats() {
+      const answered = state.answered.length;
+      const score = currentScore();
+      $("scorePill").textContent = formatScore(score);
+      $("totalQuestions").textContent = state.queue.length;
+      $("correctStat").textContent = state.correct;
+      $("wrongStat").textContent = state.wrong;
+      $("answeredStat").textContent = answered;
+      $("poolStat").textContent = state.filtered.length;
+      document.querySelector(".bar").style.setProperty("--w", `${Math.min(100, score * 10)}%`);
+    }
+
+    function currentScore() {
+      const total = state.queue.length || 1;
+      return (state.correct / total) * 10;
+    }
+
+    function finishQuiz(reason) {
+      clearInterval(state.timerId);
+      const elapsedSeconds = Math.max(0, Math.round((Date.now() - (state.startedAt || Date.now())) / 1000));
+      const result = {
+        nickname: state.nickname,
+        score: Number(formatScore(currentScore())),
+        correct: state.correct,
+        wrong: state.wrong,
+        total: state.queue.length,
+        answered: state.answered.length,
+        elapsedSeconds,
+        reason,
+        submittedAt: new Date().toISOString(),
+        date: new Date().toLocaleString("vi-VN")
+      };
+      state.lastResult = result;
+      saveHistory(result);
+      submitResultToGoogleSheet(result);
+      showResultModal();
+    }
+
+    function showResultModal() {
+      showScreen("quiz");
+      const result = state.lastResult;
+      if (!result) return;
+      $("resultTitle").textContent = `${result.nickname}: ${formatScore(result.score)}/10`;
+      $("resultRemark").textContent = pickRemark(result.score);
+      $("finalScoreBox").innerHTML = `<strong>${formatScore(result.score)}/10</strong><br>${result.correct} đúng trên ${result.total} câu`;
+      $("finalDetailBox").innerHTML = `<strong>${formatTime(result.elapsedSeconds)}</strong><br>${result.answered} câu đã trả lời, ${result.wrong} câu sai`;
+      renderHistory();
+      $("resultModal").classList.add("active");
+    }
+
+    function showReview() {
+      $("resultModal").classList.remove("active");
+      if (!state.answered.length) {
+        toast("Chưa có câu nào để xem lại.");
+        return;
+      }
+      state.reviewIndex = 0;
+      showScreen("review");
+      renderReview();
+    }
+
+    function renderReview() {
+      const item = state.answered[state.reviewIndex];
+      const question = item.question;
+      $("reviewIndex").textContent = state.reviewIndex + 1;
+      $("reviewTotal").textContent = state.answered.length;
+      $("reviewUnit").textContent = question.unit;
+      $("reviewLevel").textContent = question.level;
+      $("reviewCategory").textContent = question.category;
+      $("reviewQuestion").textContent = question.question;
+      $("userAnswerBox").className = `box ${item.isCorrect ? "good" : "bad"}`;
+      $("userAnswerBox").innerHTML = `<strong>Lựa chọn của bạn</strong><br>${escapeHtml(item.timedOut ? "Hết giờ" : item.userAnswer || "Chưa chọn")}`;
+      $("correctAnswerBox").innerHTML = `<strong>Đáp án đúng</strong><br>${escapeHtml(question.answer)}`;
+      $("explanationBox").innerHTML = `<strong>Giải thích</strong><br>${escapeHtml(question.explanation)}`;
+      $("prevReviewBtn").disabled = state.reviewIndex === 0;
+      $("nextReviewBtn").disabled = state.reviewIndex === state.answered.length - 1;
+    }
+
+    function newQuiz() {
+      $("resultModal").classList.remove("active");
+      showScreen("start");
+      loadLeaderboard();
+      $("nicknameInput").focus();
+    }
+
+    function saveHistory(result) {
+      const history = getHistory();
+      history.unshift(result);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 120)));
+    }
+
+    function renderHistory() {
+      const history = getHistory().filter((item) => item.nickname === state.nickname).slice(0, 10);
+      if (!history.length) {
+        $("historyWrap").innerHTML = `<div class="empty">Chưa có lịch sử.</div>`;
+        return;
+      }
+      $("historyWrap").innerHTML = `
+        <table class="history">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Điểm</th>
+              <th>Đúng</th>
+              <th>Sai</th>
+              <th>Tổng</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${history.map((item) => `
+              <tr>
+                <td>${escapeHtml(item.date)}</td>
+                <td>${formatScore(item.score)}</td>
+                <td>${item.correct}</td>
+                <td>${item.wrong}</td>
+                <td>${item.total}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    async function submitResultToGoogleSheet(result) {
+      if (!GOOGLE_SCRIPT_URL) {
+        renderLeaderboard(buildLocalLeaderboard());
+        return;
+      }
+      try {
+        await fetch(GOOGLE_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(result)
+        });
+        setTimeout(loadLeaderboard, 1200);
+      } catch (error) {
+        console.warn("Không gửi được kết quả lên Google Sheet:", error);
+      }
+    }
+
+    function loadLeaderboard() {
+      if (!GOOGLE_SCRIPT_URL) {
+        renderLeaderboard(buildLocalLeaderboard());
+        return;
+      }
+
+      const callbackName = `vocabQuestLeaderboard${Date.now()}`;
+      const script = document.createElement("script");
+      window[callbackName] = (payload) => {
+        const rows = Array.isArray(payload && payload.top) ? payload.top : [];
+        renderLeaderboard(rows.length ? rows : buildLocalLeaderboard());
+        script.remove();
+        delete window[callbackName];
+      };
+      script.onerror = () => {
+        renderLeaderboard(buildLocalLeaderboard());
+        script.remove();
+        delete window[callbackName];
+      };
+      script.src = `${GOOGLE_SCRIPT_URL}?action=top&limit=5&callback=${callbackName}`;
+      document.body.appendChild(script);
+    }
+
+    function renderLeaderboard(rows) {
+      if (!rows.length) {
+        $("leaderboardList").className = "empty";
+        $("leaderboardList").textContent = "Chưa có dữ liệu. Làm một lượt để tạo bảng xếp hạng trên máy này.";
+        return;
+      }
+      $("leaderboardList").className = "";
+      $("leaderboardList").innerHTML = rows.map((row, index) => `
+        <div class="leader-row">
+          <span class="rank">${index + 1}</span>
+          <span>${escapeHtml(row.nickname)}<span class="small">${formatTime(row.elapsedSeconds)} · ${row.correct}/${row.total} câu</span></span>
+          <strong>${formatScore(row.score)}</strong>
+        </div>
+      `).join("");
+    }
+
+    function buildLocalLeaderboard() {
+      return getHistory().slice().sort(compareResults).slice(0, 5);
+    }
+
+    function compareResults(a, b) {
+      if (Number(b.score) !== Number(a.score)) return Number(b.score) - Number(a.score);
+      if (Number(a.elapsedSeconds || 0) !== Number(b.elapsedSeconds || 0)) {
+        return Number(a.elapsedSeconds || 0) - Number(b.elapsedSeconds || 0);
+      }
+      return new Date(a.submittedAt || a.date) - new Date(b.submittedAt || b.date);
+    }
+
+    function getHistory() {
+      try {
+        return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+      } catch {
+        return [];
+      }
+    }
+
+    function selectedUnitValues() {
+      return [...document.querySelectorAll("input[name='unit']:checked")]
+        .map((input) => Number(input.value));
+    }
+
+    function showScreen(name) {
+      Object.values(screens).forEach((screen) => screen.classList.remove("active"));
+      screens[name].classList.add("active");
+    }
+
+    function pickRemark(score) {
+      if (score >= 9) return "Rất gọn. Từ vựng đang vào guồng tốt.";
+      if (score >= 7) return "Ổn áp. Chỉ cần vá vài chỗ là chắc hơn nhiều.";
+      if (score >= 5) return "Có nền rồi. Xem lại câu sai và làm thêm một lượt nữa sẽ lên nhanh.";
+      return "Chưa sao cả. Bộ này sinh ra để luyện nhiều vòng, mỗi vòng nhớ thêm một ít.";
+    }
+
+    function formatScore(score) {
+      return Number(score || 0).toFixed(2);
+    }
+
+    function formatTime(seconds) {
+      const total = Math.max(0, Number(seconds || 0));
+      const minutes = Math.floor(total / 60);
+      const rest = total % 60;
+      return `${minutes}:${String(rest).padStart(2, "0")}`;
+    }
+
+    function shuffle(array) {
+      for (let index = array.length - 1; index > 0; index -= 1) {
+        const randomIndex = Math.floor(Math.random() * (index + 1));
+        [array[index], array[randomIndex]] = [array[randomIndex], array[index]];
+      }
+      return array;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    let toastId = null;
+    function toast(message) {
+      $("toast").textContent = message;
+      $("toast").classList.add("show");
+      clearTimeout(toastId);
+      toastId = setTimeout(() => $("toast").classList.remove("show"), 2400);
+    }
+  </script>
+</body>
+</html>
