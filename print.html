@@ -214,7 +214,7 @@
 
     .exam-header {
       display: grid;
-      grid-template-columns: 1fr 32mm;
+      grid-template-columns: 1fr 36mm;
       gap: 6mm;
       align-items: start;
       padding-bottom: 3mm;
@@ -278,28 +278,40 @@
       min-height: 4mm;
     }
 
-    .qr-code-box {
+    .code-score-box {
       display: grid;
-      justify-items: center;
-      gap: 1mm;
-      padding: 1.5mm;
-      border: 1px solid #000;
+      border: 1.2px solid #000;
       text-align: center;
       font-weight: 700;
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
-    .qr-code-box svg {
-      width: 24mm;
-      height: 24mm;
-      display: block;
+    .code-score-row {
+      display: grid;
+      grid-template-columns: 14mm 1fr;
+      min-height: 13mm;
     }
 
-    .qr-code-label {
-      display: block;
-      font-size: 9pt;
-      letter-spacing: .5px;
+    .code-score-row + .code-score-row {
+      border-top: 1px solid #000;
+    }
+
+    .code-score-label,
+    .code-score-value {
+      display: grid;
+      place-items: center;
+      padding: 1mm;
+    }
+
+    .code-score-label {
+      border-right: 1px solid #000;
+      font-size: 8.5pt;
+    }
+
+    .code-score-value {
+      font-size: 13pt;
+      letter-spacing: .8px;
     }
 
     .answer-sheet {
@@ -398,8 +410,7 @@
       break-inside: avoid;
       page-break-inside: avoid;
       margin: 0 0 2.4mm;
-      padding: 0 0 1.8mm;
-      border-bottom: 1px dotted #c7c7c7;
+      padding: 0 0 0.8mm;
     }
 
     .end-note {
@@ -727,7 +738,6 @@
     <section class="exam" id="exam"></section>
   </main>
 
-  <script src="qrcode-generator.js"></script>
   <script src="embedded_manifest.js"></script>
   <script src="embedded_smart_world.js"></script>
   <script src="embedded_global_success.js"></script>
@@ -1039,7 +1049,7 @@
               <span>Ngày:</span><span class="line"></span>
             </div>
           </div>
-          ${renderCodeQr()}
+          ${renderCodeScoreBox()}
         </header>
       `;
     }
@@ -1106,11 +1116,17 @@
       `;
     }
 
-    function renderCodeQr() {
+    function renderCodeScoreBox() {
       return `
-        <div class="qr-code-box">
-          ${makeQrSvg(state.paper.code)}
-          <span class="qr-code-label">Mã đề: ${escapeHtml(state.paper.code)}</span>
+        <div class="code-score-box">
+          <div class="code-score-row">
+            <span class="code-score-label">Mã đề</span>
+            <span class="code-score-value">${escapeHtml(state.paper.code)}</span>
+          </div>
+          <div class="code-score-row">
+            <span class="code-score-label">Điểm</span>
+            <span class="code-score-value"></span>
+          </div>
         </div>
       `;
     }
@@ -1122,16 +1138,6 @@
         <i class="scan-marker bl" aria-hidden="true"></i>
         <i class="scan-marker br" aria-hidden="true"></i>
       `;
-    }
-
-    function makeQrSvg(value) {
-      if (typeof qrcode !== "function") {
-        return `<strong>${escapeHtml(value)}</strong>`;
-      }
-      const qr = qrcode(0, "M");
-      qr.addData(String(value));
-      qr.make();
-      return qr.createSvgTag(3, 1);
     }
 
     function getTimeLimit() {
@@ -1197,8 +1203,7 @@
       const questions = state.paper.questions;
       return `
         <section class="stats-section">
-          <h2 class="stats-title">Thống kê đề</h2>
-          <p><strong>Số câu:</strong> ${state.paper.count}</p>
+          <h2 class="stats-title">Thống kê đề: Tổng ${state.paper.count} câu hỏi</h2>
           <div class="stats-grid">
             ${renderStatsTable("Theo Unit", countBy(questions, getQuestionUnitLabel), false)}
             ${renderStatsTable("Theo mức độ", countBy(questions, (question) => question.level || "Không rõ"), true, ["Dễ", "Trung bình", "Khá", "Khó"])}
