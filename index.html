@@ -626,7 +626,7 @@
       <div class="shell start">
         <div class="intro">
           <span class="eyebrow">English 8 Vocabulary Quest</span>
-          <h1>Luyện từ vựng Lớp 8 Smart World</h1>
+          <h1>Luyện từ vựng theo Unit</h1>
           <p class="lede">Chọn chủ đề, vào trận quiz 4 lựa chọn, luyện nghĩa, phiên âm, từ loại và câu điền từ. Sai thì xem giải thích ngay, đúng thì giữ nhịp tiếp tục.</p>
 
           <form id="startForm" class="setup">
@@ -779,19 +779,12 @@
     const START_TOTAL = 20;
     const QUESTIONS_PER_LEVEL = START_TOTAL / LEVELS.length;
     const EXTRA_ON_WRONG = 2;
-    const UNITS = [
-      { unitNumber: 1, unitTitle: "Free time" },
-      { unitNumber: 2, unitTitle: "Life in the Country" },
-      { unitNumber: 3, unitTitle: "Protecting the Environment" },
-      { unitNumber: 4, unitTitle: "Disasters" },
-      { unitNumber: 5, unitTitle: "Science and Technology" },
-      { unitNumber: 6, unitTitle: "Life on Other Planets" },
-      { unitNumber: 7, unitTitle: "Teens" },
-      { unitNumber: 8, unitTitle: "Traditions of Ethnic Groups in Vietnam" }
-    ];
+    const QUESTION_MANIFEST_URL = "question_manifes.json";
 
     const state = {
       questions: [],
+      questionFile: "",
+      questionTitle: "",
       filtered: [],
       queue: [],
       usedIds: new Set(),
@@ -820,16 +813,67 @@
 
     async function init() {
       bindEvents();
-      renderFilters();
       try {
-        const response = await fetch("questions.json", { cache: "no-store" });
-        if (!response.ok) throw new Error("Không tải được questions.json");
+        const selectedDataset = await resolveQuestionDataset();
+        state.questionFile = selectedDataset.file;
+        state.questionTitle = selectedDataset.title || selectedDataset.file;
+        const response = await fetch(selectedDataset.file, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Không tải được ${selectedDataset.file}`);
         state.questions = await response.json();
+        renderFilters();
+        updateDatasetUi();
         loadLeaderboard();
       } catch (error) {
-        toast("Không đọc được questions.json. Hãy mở bằng local server hoặc GitHub Pages.");
+        renderFilters([]);
+        toast("Không đọc được file câu hỏi. Hãy kiểm tra tham số URL, manifest và mở bằng local server hoặc GitHub Pages.");
         console.error(error);
       }
+    }
+
+    async function resolveQuestionDataset() {
+      const manifest = await loadQuestionManifest();
+      const params = new URLSearchParams(window.location.search);
+      const requested = params.get("questions") || params.get("file") || params.get("data") || params.get("bank") || params.get("q");
+      const datasets = Array.isArray(manifest.datasets) ? manifest.datasets : [];
+      const defaultFile = manifest.default || (datasets[0] && datasets[0].file) || "question_global_success.json";
+
+      if (!requested) {
+        return findDataset(defaultFile, datasets) || { file: defaultFile, title: defaultFile };
+      }
+
+      const match = findDataset(requested, datasets);
+      const file = match ? match.file : requested;
+      if (!isSafeQuestionFile(file)) {
+        throw new Error(`Tên file câu hỏi không hợp lệ: ${file}`);
+      }
+      return match || { file, title: file };
+    }
+
+    async function loadQuestionManifest() {
+      try {
+        const response = await fetch(QUESTION_MANIFEST_URL, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Không tải được ${QUESTION_MANIFEST_URL}`);
+        return await response.json();
+      } catch (error) {
+        console.warn("Không đọc được question_manifes.json, dùng mặc định.", error);
+        return {
+          default: "question_global_success.json",
+          datasets: [
+            { id: "global_success", title: "English 8 Global Success", file: "question_global_success.json" },
+            { id: "smart_world", title: "English 8 Smart World", file: "question_smart_world.json" }
+          ]
+        };
+      }
+    }
+
+    function findDataset(value, datasets) {
+      return datasets.find((dataset) =>
+        dataset.id === value || dataset.file === value || dataset.title === value
+      );
+    }
+
+    function isSafeQuestionFile(file) {
+      return /^[\w.-]+\.json$/i.test(file) && !file.includes("..") && !file.includes("/") && !file.includes("\\");
     }
 
     function bindEvents() {
@@ -854,16 +898,64 @@
       });
     }
 
-    function renderFilters() {
-      $("unitChoices").innerHTML = UNITS.map((unit) => `
+    function renderFilters(units = getUnitsFromQuestions()) {
+      if (!units.length) {
+        $("unitChoices").innerHTML = `<div class="empty">Chưa tải được danh sách Unit.</div>`;
+        return;
+      }
+      $("unitChoices").innerHTML = units.map((unit) => `
         <label class="unit-card">
           <input type="checkbox" name="unit" value="${unit.unitNumber}" checked>
           <span>
-            <strong>Unit ${unit.unitNumber}</strong>
-            <span>${unit.unitTitle}</span>
+            <strong>Unit ${escapeHtml(unit.unitNumber)}</strong>
+            <span>${escapeHtml(unit.unitTitle)}</span>
           </span>
         </label>
       `).join("");
+    }
+
+    function getUnitsFromQuestions() {
+      const units = new Map();
+      state.questions.forEach((question) => {
+        const unitNumber = getQuestionUnitNumber(question);
+        if (!unitNumber || units.has(unitNumber)) return;
+        units.set(unitNumber, {
+          unitNumber,
+          unitTitle: getQuestionUnitTitle(question),
+        });
+      });
+      return [...units.values()].sort((a, b) => Number(a.unitNumber) - Number(b.unitNumber));
+    }
+
+    function getQuestionUnitNumber(question) {
+      return Number(question.unitNumber || extractUnitNumber(question.unit));
+    }
+
+    function getQuestionUnitTitle(question) {
+      const unitNumber = getQuestionUnitNumber(question);
+      return question.unitTitle || extractUnitTitle(question.unit) || `Unit ${unitNumber}`;
+    }
+
+    function getQuestionUnitLabel(question) {
+      const unitNumber = getQuestionUnitNumber(question);
+      const unitTitle = getQuestionUnitTitle(question);
+      return question.unit || `Unit ${unitNumber} - ${unitTitle}`;
+    }
+
+    function extractUnitNumber(unitText) {
+      const match = String(unitText || "").match(/Unit\s+(\d+)/i);
+      return match ? Number(match[1]) : null;
+    }
+
+    function extractUnitTitle(unitText) {
+      const match = String(unitText || "").match(/Unit\s+\d+\s*-\s*(.+)$/i);
+      return match ? match[1].trim() : "";
+    }
+
+    function updateDatasetUi() {
+      document.title = `${state.questionTitle} - Vocabulary Quest`;
+      const eyebrow = document.querySelector(".eyebrow");
+      if (eyebrow) eyebrow.textContent = state.questionTitle;
     }
 
     function selectAllFilters() {
@@ -882,10 +974,10 @@
 
       let selectedUnits = selectedUnitValues();
       if (!selectedUnits.length) {
-        selectedUnits = [...new Set(state.questions.map((question) => question.unitNumber))];
+        selectedUnits = [...new Set(state.questions.map(getQuestionUnitNumber).filter(Boolean))];
       }
       state.filtered = state.questions.filter((question) =>
-        selectedUnits.includes(question.unitNumber)
+        selectedUnits.includes(getQuestionUnitNumber(question))
       );
       if (!state.filtered.length) {
         toast("Không có câu hỏi phù hợp với bộ lọc.");
@@ -960,7 +1052,7 @@
 
       $("questionIndex").textContent = state.currentIndex + 1;
       $("totalQuestions").textContent = state.queue.length;
-      $("unitTag").textContent = question.unit;
+      $("unitTag").textContent = getQuestionUnitLabel(question);
       $("levelTag").textContent = question.level;
       $("categoryTag").textContent = question.category;
       $("questionText").textContent = question.question;
@@ -1116,7 +1208,7 @@
       const question = item.question;
       $("reviewIndex").textContent = state.reviewIndex + 1;
       $("reviewTotal").textContent = state.answered.length;
-      $("reviewUnit").textContent = question.unit;
+      $("reviewUnit").textContent = getQuestionUnitLabel(question);
       $("reviewLevel").textContent = question.level;
       $("reviewCategory").textContent = question.category;
       $("reviewQuestion").textContent = question.question;
