@@ -1,0 +1,15 @@
+{
+  "default": "question_global_success.json",
+  "datasets": [
+    {
+      "id": "global_success",
+      "title": "English 8 Global Success",
+      "file": "question_global_success.json"
+    },
+    {
+      "id": "smart_world",
+      "title": "English 8 Smart World",
+      "file": "question_smart_world.json"
+    }
+  ]
+}
