@@ -100,51 +100,39 @@
       min-height: 100%;
       padding: clamp(22px, 4vw, 42px);
       display: grid;
-      align-content: center;
+      align-content: start;
       gap: 16px;
       background: #e9f7f0;
+      overflow: auto;
     }
 
-    .word-card {
-      min-height: 92px;
+    .unit-panel-title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .unit-panel-note {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 780;
+      line-height: 1.35;
+    }
+
+    .unit-panel-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .unit-box {
       display: grid;
-      grid-template-columns: 54px 1fr;
-      gap: 14px;
-      align-items: center;
-      padding: 16px;
+      gap: 10px;
+      padding: 14px;
       border: 2px solid var(--ink);
       border-radius: 8px;
       background: #fff;
       box-shadow: 4px 4px 0 var(--ink);
-    }
-
-    .word-card:nth-child(2) { background: #fff7d8; }
-    .word-card:nth-child(3) { background: #edf2ff; }
-
-    .tile {
-      width: 54px;
-      aspect-ratio: 1;
-      display: grid;
-      place-items: center;
-      border: 2px solid var(--ink);
-      border-radius: 8px;
-      background: var(--coral);
-      color: #fff;
-      font-size: 28px;
-      font-weight: 950;
-    }
-
-    .word-card strong {
-      display: block;
-      font-size: 22px;
-      line-height: 1.1;
-    }
-
-    .word-card span {
-      display: block;
-      margin-top: 5px;
-      color: var(--muted);
-      font-weight: 750;
     }
 
     .setup {
@@ -626,8 +614,8 @@
       <div class="shell start">
         <div class="intro">
           <span class="eyebrow">English 8 Vocabulary Quest</span>
-          <h1>Luyện từ vựng theo Unit</h1>
-          <p class="lede">Chọn chủ đề, vào trận quiz 4 lựa chọn, luyện nghĩa, phiên âm, từ loại và câu điền từ. Sai thì xem giải thích ngay, đúng thì giữ nhịp tiếp tục.</p>
+          <h1>Tiếng Anh 8</h1>
+          <p id="genzLine" class="lede">Học chút thôi, điểm số tự biết đường lên mood.</p>
 
           <form id="startForm" class="setup">
             <div class="field">
@@ -635,14 +623,8 @@
               <input id="nicknameInput" class="input" maxlength="24" autocomplete="nickname" placeholder="Nhập tên học sinh">
             </div>
 
-            <div class="field">
-              <span class="label">Chọn Unit</span>
-              <div id="unitChoices" class="unit-list"></div>
-            </div>
-
             <div class="start-actions">
               <button class="btn primary" type="submit">Bắt đầu</button>
-              <button id="selectAllBtn" class="btn ghost" type="button">Tất cả</button>
             </div>
           </form>
 
@@ -652,18 +634,14 @@
           </section>
         </div>
 
-        <aside class="word-wall" aria-hidden="true">
-          <div class="word-card">
-            <span class="tile">W</span>
-            <span><strong>Word</strong><span>Chọn từ đúng theo nghĩa</span></span>
+        <aside class="word-wall">
+          <h2 class="unit-panel-title">Chọn unit</h2>
+          <p class="unit-panel-note">Có thể chọn nhiều Unit. Nếu bỏ trống, hệ thống sẽ lấy tất cả.</p>
+          <div class="unit-panel-actions">
+            <button id="selectAllBtn" class="btn ghost" type="button">Tất cả</button>
           </div>
-          <div class="word-card">
-            <span class="tile">/ə/</span>
-            <span><strong>Sound</strong><span>Luyện phiên âm và nhận diện âm</span></span>
-          </div>
-          <div class="word-card">
-            <span class="tile">✓</span>
-            <span><strong>Quest</strong><span>5.120 câu từ Unit 1 đến Unit 8</span></span>
+          <div class="unit-box">
+            <div id="unitChoices" class="unit-list"></div>
           </div>
         </aside>
       </div>
@@ -780,6 +758,16 @@
     const QUESTIONS_PER_LEVEL = START_TOTAL / LEVELS.length;
     const EXTRA_ON_WRONG = 2;
     const QUESTION_MANIFEST_URL = "question_manifes.json";
+    const GENZ_LINES = [
+      "Học chút thôi, điểm số tự biết đường lên mood.",
+      "Từ vựng không tự vào đầu, nhưng mình có thể dụ nó vào.",
+      "Làm 20 câu cho não khởi động, sai thì app tặng thêm bài tập yêu thương.",
+      "Hôm nay chăm một xíu, mai gặp bài kiểm tra đỡ rén.",
+      "Không cần học như thần đồng, chỉ cần đừng để từ mới ghost mình.",
+      "Bấm bắt đầu đi, từ vựng đang chờ được xử lý gọn gàng.",
+      "Sai cũng được, miễn là sau câu sai mình khôn thêm một miếng.",
+      "Quiz nhẹ nhàng thôi, nhưng điểm cộng thì nhìn khá uy tín đó."
+    ];
 
     const state = {
       questions: [],
@@ -813,6 +801,7 @@
 
     async function init() {
       bindEvents();
+      renderGenzLine();
       try {
         const selectedDataset = await resolveQuestionDataset();
         state.questionFile = selectedDataset.file;
@@ -828,6 +817,10 @@
         toast("Không đọc được file câu hỏi. Hãy kiểm tra tham số URL, manifest và mở bằng local server hoặc GitHub Pages.");
         console.error(error);
       }
+    }
+
+    function renderGenzLine() {
+      $("genzLine").textContent = GENZ_LINES[Math.floor(Math.random() * GENZ_LINES.length)];
     }
 
     async function resolveQuestionDataset() {
