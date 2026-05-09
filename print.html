@@ -177,11 +177,8 @@
 
     .page {
       width: 210mm;
-      min-height: 297mm;
       margin: 12px auto;
-      padding: 8mm;
-      background: var(--paper);
-      box-shadow: 0 12px 36px #00000022;
+      background: transparent;
     }
 
     .exam {
@@ -189,21 +186,82 @@
       line-height: 1.18;
     }
 
+    .exam-page,
+    .answer-page {
+      position: relative;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 12px auto;
+      padding: 8mm 8mm 15mm;
+      background: var(--paper);
+      box-shadow: 0 12px 36px #00000022;
+    }
+
+    .exam-page {
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .answer-page {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .exam-page.last {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
     .exam-header {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr 32mm;
       gap: 6mm;
       align-items: start;
       padding-bottom: 3mm;
       border-bottom: 1px solid #000;
     }
 
-    .exam-header h1 {
+    .exam-title-row {
+      display: flex;
+      align-items: baseline;
+      gap: 4mm;
+      flex-wrap: wrap;
+      margin-bottom: 2mm;
+    }
+
+    .exam-title-row h1 {
       margin: 0 0 2mm;
       font-size: 15pt;
       line-height: 1;
       letter-spacing: 0;
       text-transform: uppercase;
+    }
+
+    .exam-time {
+      font-size: 9pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .exam-info-row {
+      display: flex;
+      gap: 8mm;
+      align-items: baseline;
+      margin-bottom: 2mm;
+      font-size: 9pt;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+
+    .dot-line {
+      display: inline-block;
+      min-width: 34mm;
+      border-bottom: 1px dotted #000;
+      transform: translateY(-1px);
+    }
+
+    .exam-title-row .dot-line {
+      min-width: 78mm;
     }
 
     .student-info {
@@ -220,32 +278,69 @@
       min-height: 4mm;
     }
 
-    .code-box {
-      min-width: 42mm;
-      padding: 2mm 3mm;
+    .qr-code-box {
+      display: grid;
+      justify-items: center;
+      gap: 1mm;
+      padding: 1.5mm;
       border: 1px solid #000;
       text-align: center;
       font-weight: 700;
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
-    .code-box strong {
+    .qr-code-box svg {
+      width: 24mm;
+      height: 24mm;
       display: block;
-      margin-top: 1mm;
-      font-size: 18pt;
-      letter-spacing: 1px;
+    }
+
+    .qr-code-label {
+      display: block;
+      font-size: 9pt;
+      letter-spacing: .5px;
     }
 
     .answer-sheet {
+      position: relative;
       margin: 3mm 0;
-      padding-bottom: 2mm;
+      padding: 2mm 0 2mm;
       border-bottom: 1px solid #000;
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
+    .answer-sheet.marked {
+      margin-top: 4mm;
+      padding: 7mm 8mm 8mm;
+      border: 1.2px solid #000;
+    }
+
+    .answer-sheet.centered {
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .scan-marker {
+      position: absolute;
+      width: 5mm;
+      height: 5mm;
+      background: #000;
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+
+    .scan-marker.tl { top: 1.5mm; left: 1.5mm; }
+    .scan-marker.tr { top: 1.5mm; right: 1.5mm; }
+    .scan-marker.bl { bottom: 1.5mm; left: 1.5mm; }
+    .scan-marker.br { bottom: 1.5mm; right: 1.5mm; }
+
     .answer-sheet-title {
       margin: 0 0 1.5mm;
       font-weight: 700;
+      text-align: center;
     }
 
     .bubble-grid {
@@ -307,15 +402,30 @@
       border-bottom: 1px dotted #c7c7c7;
     }
 
-    .q-text {
-      margin: 0 0 1mm;
+    .end-note {
+      margin: 4mm 0 0;
+      text-align: center;
+      font-weight: 900;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .page-footer {
+      position: absolute;
+      left: 8mm;
+      right: 8mm;
+      bottom: 5mm;
+      display: flex;
+      justify-content: space-between;
+      border-top: 1px solid #000;
+      padding-top: 1.5mm;
+      font-size: 8.5pt;
       font-weight: 700;
     }
 
-    .q-meta {
-      color: #555;
-      font-size: .88em;
-      font-weight: 400;
+    .q-text {
+      margin: 0 0 1mm;
+      font-weight: 700;
     }
 
     .options {
@@ -334,11 +444,6 @@
       text-decoration: underline;
     }
 
-    .answer-page {
-      break-before: page;
-      page-break-before: always;
-    }
-
     .answer-page.no-answer-key {
       display: none;
     }
@@ -348,13 +453,6 @@
       text-align: center;
       font-size: 15pt;
       text-transform: uppercase;
-    }
-
-    .key-meta {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 3mm;
-      font-weight: 700;
     }
 
     .key-grid {
@@ -382,6 +480,110 @@
       color: #fff;
     }
 
+    .readable-key {
+      margin-top: 3mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .readable-key-title {
+      margin: 0 0 1.5mm;
+      font-weight: 700;
+    }
+
+    .readable-key-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-flow: column;
+      grid-template-rows: repeat(var(--key-rows, 8), auto);
+      gap: 1.2mm 2mm;
+      font-size: 9pt;
+    }
+
+    .readable-key-item {
+      padding-bottom: .7mm;
+      border-bottom: 1px dotted #b6b6b6;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .teacher-sign {
+      width: 66mm;
+      min-height: 30mm;
+      margin: 5mm 0 0 auto;
+      padding: 3mm;
+      border: 1px solid #000;
+      text-align: center;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .teacher-sign strong {
+      display: block;
+      margin-bottom: 2mm;
+      text-transform: uppercase;
+    }
+
+    .teacher-sign .sign-line {
+      display: block;
+      margin-top: 16mm;
+      border-top: 1px dotted #000;
+      padding-top: 1mm;
+      font-size: 8.5pt;
+    }
+
+    .stats-section {
+      margin-top: 4mm;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .stats-title {
+      margin: 0 0 2mm;
+      font-size: 12pt;
+      text-transform: uppercase;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 3mm;
+      align-items: start;
+    }
+
+    .stats-box {
+      min-width: 0;
+    }
+
+    .stats-box h3 {
+      margin: 0 0 1.5mm;
+      font-size: 10pt;
+    }
+
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8.8pt;
+    }
+
+    .stats-table th,
+    .stats-table td {
+      padding: 1mm 1.2mm;
+      border: 1px solid #000;
+      vertical-align: top;
+    }
+
+    .stats-table th {
+      background: #f0f0f0;
+      text-align: left;
+    }
+
+    .stats-table td:nth-child(2),
+    .stats-table td:nth-child(3) {
+      text-align: right;
+      white-space: nowrap;
+    }
+
     .empty {
       padding: 12px;
       color: var(--muted);
@@ -400,6 +602,12 @@
 
       .page {
         width: calc(100% - 20px);
+        min-height: auto;
+      }
+
+      .exam-page,
+      .answer-page {
+        width: 100%;
         min-height: auto;
       }
     }
@@ -427,6 +635,16 @@
         min-height: auto;
         margin: 0;
         padding: 0;
+        background: transparent;
+        box-shadow: none;
+      }
+
+      .exam-page,
+      .answer-page {
+        width: auto;
+        min-height: 283mm;
+        margin: 0;
+        padding: 0 0 12mm;
         box-shadow: none;
       }
 
@@ -452,7 +670,7 @@
   <form class="toolbar" id="controlForm">
     <label class="field">
       <span>Mã đề</span>
-      <input id="examCodeInput" placeholder="Để trống để tự tạo">
+      <input id="examCodeInput" maxlength="3" placeholder="Để trống để tự tạo">
     </label>
     <label class="field">
       <span>Bộ đề</span>
@@ -461,6 +679,10 @@
     <label class="field">
       <span>Số câu hỏi</span>
       <input id="questionCountInput" type="number" min="1" max="284" value="40">
+    </label>
+    <label class="field">
+      <span>Thời gian</span>
+      <input id="timeLimitInput" type="number" min="1" max="180" value="45">
     </label>
     <label class="field">
       <span>Font size</span>
@@ -505,10 +727,19 @@
     <section class="exam" id="exam"></section>
   </main>
 
+  <script src="qrcode-generator.js"></script>
+  <script src="embedded_manifest.js"></script>
+  <script src="embedded_smart_world.js"></script>
+  <script src="embedded_global_success.js"></script>
   <script>
     const LETTERS = ["A", "B", "C", "D"];
     const QUESTION_MANIFEST_URL = "question_manifes.json";
     const $ = (id) => document.getElementById(id);
+    const EMBEDDED_DATASETS = {
+      "question_global_success.json": () => window.EMBEDDED_GLOBAL_SUCCESS,
+      "question_smart_world.json": () => window.EMBEDDED_SMART_WORLD,
+      "questions.json": () => window.EMBEDDED_SMART_WORLD
+    };
 
     const state = {
       manifest: null,
@@ -528,6 +759,7 @@
       if (params.get("code")) $("examCodeInput").value = params.get("code");
       if (params.get("count")) $("questionCountInput").value = params.get("count");
       if (params.get("font")) $("fontSizeInput").value = params.get("font");
+      if (params.get("time")) $("timeLimitInput").value = params.get("time");
 
       try {
         state.manifest = await loadQuestionManifest();
@@ -577,17 +809,28 @@
         document.documentElement.style.setProperty("--font-size", $("fontSizeInput").value);
         document.documentElement.style.setProperty("--print-font-size", $("fontSizeInput").value);
       });
+      $("timeLimitInput").addEventListener("change", () => {
+        updateUrl(state.paper?.code || $("examCodeInput").value.trim().toUpperCase(), Number($("questionCountInput").value || 40));
+        renderPaper();
+      });
       $("separateAnswerInput").addEventListener("change", renderPaper);
       $("boldAnswerInput").addEventListener("change", renderPaper);
       $("studentAnswerInput").addEventListener("change", renderPaper);
     }
 
     async function loadQuestionManifest() {
+      if (location.protocol === "file:" && window.EMBEDDED_MANIFEST) {
+        return window.EMBEDDED_MANIFEST;
+      }
       try {
         const response = await fetch(QUESTION_MANIFEST_URL, { cache: "no-store" });
         if (!response.ok) throw new Error(`Không tải được ${QUESTION_MANIFEST_URL}`);
         return await response.json();
       } catch (error) {
+        if (window.EMBEDDED_MANIFEST) {
+          console.warn("Không đọc được question_manifes.json, dùng dữ liệu nhúng.", error);
+          return window.EMBEDDED_MANIFEST;
+        }
         console.warn("Không đọc được question_manifes.json, dùng mặc định.", error);
         return {
           default: "question_global_success.json",
@@ -623,11 +866,32 @@
       state.questionFile = dataset.file;
       state.questionTitle = dataset.title || dataset.file;
       $("datasetInput").value = dataset.id || dataset.file;
-      const response = await fetch(dataset.file, { cache: "no-store" });
-      if (!response.ok) throw new Error(`Không tải được ${dataset.file}`);
-      state.questions = await response.json();
+      state.questions = await readQuestionData(dataset.file);
       renderUnitChoices();
       document.title = `${state.questionTitle} - Tạo đề in offline`;
+    }
+
+    async function readQuestionData(file) {
+      const embedded = getEmbeddedDataset(file);
+      if (location.protocol === "file:" && embedded) return embedded;
+
+      try {
+        const response = await fetch(file, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Không tải được ${file}`);
+        return await response.json();
+      } catch (error) {
+        if (embedded) {
+          console.warn(`Không đọc được ${file}, dùng dữ liệu nhúng.`, error);
+          return embedded;
+        }
+        throw error;
+      }
+    }
+
+    function getEmbeddedDataset(file) {
+      const normalized = String(file || "").split("/").pop();
+      const resolver = EMBEDDED_DATASETS[normalized];
+      return resolver ? resolver() : null;
     }
 
     function renderUnitChoices() {
@@ -685,11 +949,11 @@
       const count = clamp(Number($("questionCountInput").value || 40), 1, state.filtered.length);
       $("questionCountInput").value = count;
 
-      let code = $("examCodeInput").value.trim().toUpperCase();
+      let code = normalizeExamCode($("examCodeInput").value);
       if (!code) {
         code = makeExamCode();
-        $("examCodeInput").value = code;
       }
+      $("examCodeInput").value = code;
 
       const unitSeed = selectedUnitValues().join(",");
       const seed = hashString(`${code}|${count}|${state.questionFile}|${unitSeed}|english-quiz-print`);
@@ -727,29 +991,47 @@
       document.documentElement.style.setProperty("--print-font-size", $("fontSizeInput").value);
 
       const answerPageClass = $("separateAnswerInput").checked ? "answer-page" : "answer-page no-answer-key";
+      const examPages = buildExamPages();
+      const pageCount = examPages.length;
       $("exam").innerHTML = `
-        ${renderHeader()}
-        ${$("studentAnswerInput").checked ? renderAnswerSheet(false) : ""}
-        <section class="questions">
-          ${state.paper.questions.map(renderQuestion).join("")}
-        </section>
+        ${examPages.map((questions, index) => renderExamPage(questions, index + 1, pageCount)).join("")}
         <section class="${answerPageClass}">
-          <h2 class="key-title">Bảng đáp án</h2>
-          <div class="key-meta">
-            <span>Mã đề: ${escapeHtml(state.paper.code)}</span>
-            <span>Số câu: ${state.paper.count}</span>
-          </div>
+          <h2 class="key-title">BẢNG ĐÁP ÁN ĐỀ ${escapeHtml(state.paper.code)}</h2>
           ${renderAnswerSheet(true)}
+          ${renderReadableAnswerKey()}
+          ${renderStatsSection()}
+          ${renderTeacherSignature()}
         </section>
       `;
     }
 
-    function renderHeader() {
+    function renderExamPage(questions, pageNumber, pageCount) {
+      const isFirstPage = pageNumber === 1;
+      const isLastPage = pageNumber === pageCount;
+      return `
+        <section class="exam-page ${isLastPage && !$("separateAnswerInput").checked ? "last" : ""}">
+          ${isFirstPage ? renderHeader(pageCount) : ""}
+          ${isFirstPage && $("studentAnswerInput").checked ? renderAnswerSheet(false) : ""}
+          <section class="questions">
+            ${questions.map(renderQuestion).join("")}
+          </section>
+          ${isLastPage ? `<p class="end-note">--- Hết ---</p>` : ""}
+          ${renderExamFooter(pageNumber, pageCount)}
+        </section>
+      `;
+    }
+
+    function renderHeader(pageCount) {
       return `
         <header class="exam-header">
           <div>
-            <h1>Đề kiểm tra tiếng Anh</h1>
-            <div><strong>${escapeHtml(state.questionTitle)}</strong></div>
+            <div class="exam-title-row">
+              <h1>ĐỀ KIỂM TRA: <span class="dot-line"></span></h1>
+            </div>
+            <div class="exam-info-row">
+              <span>Thời gian làm bài: <span class="dot-line"></span> phút</span>
+              <span>Đề kiểm tra có ${pageCount} trang, ${state.paper.count} câu hỏi</span>
+            </div>
             <div class="student-info">
               <span>Họ và tên:</span><span class="line"></span>
               <span>Lớp:</span><span class="line"></span>
@@ -757,11 +1039,17 @@
               <span>Ngày:</span><span class="line"></span>
             </div>
           </div>
-          <div class="code-box">
-            Mã đề
-            <strong>${escapeHtml(state.paper.code)}</strong>
-          </div>
+          ${renderCodeQr()}
         </header>
+      `;
+    }
+
+    function renderExamFooter(pageNumber, pageCount) {
+      return `
+        <footer class="page-footer">
+          <span>Trang ${pageNumber}/${pageCount}</span>
+          <span>Mã đề: ${escapeHtml(state.paper.code)}</span>
+        </footer>
       `;
     }
 
@@ -786,11 +1074,97 @@
       `).join("");
 
       return `
-        <section class="answer-sheet">
+        <section class="answer-sheet marked centered">
+          ${renderScanMarkers()}
           <p class="answer-sheet-title">${withKey ? "Đáp án để chấm" : "Bảng điền câu trả lời"}</p>
           <div class="${withKey ? "key-grid" : "bubble-grid"}">${rows}</div>
         </section>
       `;
+    }
+
+    function renderReadableAnswerKey() {
+      const rows = Math.ceil(state.paper.questions.length / 5);
+      const items = state.paper.questions.map((question) => {
+        const correctIndex = question.printOptions.indexOf(question.answer);
+        const letter = LETTERS[correctIndex] || "?";
+        return `<div class="readable-key-item">Câu ${question.printNumber}: ${letter}</div>`;
+      }).join("");
+      return `
+        <section class="readable-key">
+          <p class="readable-key-title">Đáp án đọc nhanh</p>
+          <div class="readable-key-grid" style="--key-rows: ${rows}">${items}</div>
+        </section>
+      `;
+    }
+
+    function renderTeacherSignature() {
+      return `
+        <section class="teacher-sign">
+          <strong>Giáo viên</strong>
+          <span class="sign-line">Ký và ghi rõ họ tên</span>
+        </section>
+      `;
+    }
+
+    function renderCodeQr() {
+      return `
+        <div class="qr-code-box">
+          ${makeQrSvg(state.paper.code)}
+          <span class="qr-code-label">Mã đề: ${escapeHtml(state.paper.code)}</span>
+        </div>
+      `;
+    }
+
+    function renderScanMarkers() {
+      return `
+        <i class="scan-marker tl" aria-hidden="true"></i>
+        <i class="scan-marker tr" aria-hidden="true"></i>
+        <i class="scan-marker bl" aria-hidden="true"></i>
+        <i class="scan-marker br" aria-hidden="true"></i>
+      `;
+    }
+
+    function makeQrSvg(value) {
+      if (typeof qrcode !== "function") {
+        return `<strong>${escapeHtml(value)}</strong>`;
+      }
+      const qr = qrcode(0, "M");
+      qr.addData(String(value));
+      qr.make();
+      return qr.createSvgTag(3, 1);
+    }
+
+    function getTimeLimit() {
+      return clamp(Number($("timeLimitInput").value || 45), 1, 180);
+    }
+
+    function buildExamPages() {
+      const pages = [];
+      let remaining = [...state.paper.questions];
+      const firstPageSize = getQuestionsPerPage(true);
+      const nextPageSize = getQuestionsPerPage(false);
+      pages.push(remaining.splice(0, firstPageSize));
+      while (remaining.length) {
+        pages.push(remaining.splice(0, nextPageSize));
+      }
+      return pages.filter((page) => page.length || !pages.length);
+    }
+
+    function getQuestionsPerPage(isFirstPage) {
+      const font = Number.parseFloat($("fontSizeInput").value) || 10;
+      const hasAnswerSheet = $("studentAnswerInput").checked;
+      if (isFirstPage && hasAnswerSheet) {
+        if (font <= 8.5) return 18;
+        if (font <= 9) return 16;
+        if (font <= 10) return 14;
+        if (font <= 11) return 12;
+        return 10;
+      }
+      if (font <= 8.5) return 34;
+      if (font <= 9) return 30;
+      if (font <= 10) return 26;
+      if (font <= 11) return 22;
+      return 18;
     }
 
     function makeColumns(items, columnCount) {
@@ -807,7 +1181,6 @@
         <article class="question">
           <p class="q-text">
             ${question.printNumber}. ${escapeHtml(question.question)}
-            <span class="q-meta">(${escapeHtml(getQuestionUnitLabel(question))} · ${escapeHtml(question.level)})</span>
           </p>
           <div class="options">
             ${question.printOptions.map((option, index) => `
@@ -820,18 +1193,100 @@
       `;
     }
 
+    function renderStatsSection() {
+      const questions = state.paper.questions;
+      return `
+        <section class="stats-section">
+          <h2 class="stats-title">Thống kê đề</h2>
+          <p><strong>Số câu:</strong> ${state.paper.count}</p>
+          <div class="stats-grid">
+            ${renderStatsTable("Theo Unit", countBy(questions, getQuestionUnitLabel), false)}
+            ${renderStatsTable("Theo mức độ", countBy(questions, (question) => question.level || "Không rõ"), true, ["Dễ", "Trung bình", "Khá", "Khó"])}
+            ${renderStatsTable("Theo loại câu hỏi", countBy(questions, getQuestionCategoryLabel), true)}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderStatsTable(title, rows, includePercent, preferredOrder = null) {
+      const total = state.paper.questions.length || 1;
+      const orderedRows = orderStatsRows(rows, preferredOrder);
+      return `
+        <div class="stats-box">
+          <h3>${escapeHtml(title)}</h3>
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>Nội dung</th>
+                <th>Số câu</th>
+                ${includePercent ? "<th>%</th>" : ""}
+              </tr>
+            </thead>
+            <tbody>
+              ${orderedRows.map(([label, count]) => `
+                <tr>
+                  <td>${escapeHtml(label)}</td>
+                  <td>${count}</td>
+                  ${includePercent ? `<td>${formatPercent(count, total)}</td>` : ""}
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function countBy(items, getLabel) {
+      return items.reduce((map, item) => {
+        const label = getLabel(item) || "Không rõ";
+        map.set(label, (map.get(label) || 0) + 1);
+        return map;
+      }, new Map());
+    }
+
+    function orderStatsRows(rows, preferredOrder) {
+      const entries = [...rows.entries()];
+      if (!preferredOrder) {
+        return entries.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "vi"));
+      }
+      const rank = new Map(preferredOrder.map((label, index) => [label, index]));
+      return entries.sort((a, b) => {
+        const rankA = rank.has(a[0]) ? rank.get(a[0]) : Number.MAX_SAFE_INTEGER;
+        const rankB = rank.has(b[0]) ? rank.get(b[0]) : Number.MAX_SAFE_INTEGER;
+        return rankA - rankB || a[0].localeCompare(b[0], "vi");
+      });
+    }
+
+    function getQuestionCategoryLabel(question) {
+      return question.category || question.categoryKey || "Không rõ";
+    }
+
+    function formatPercent(count, total) {
+      return `${((count / total) * 100).toFixed(1)}%`;
+    }
+
     function makeExamCode() {
       const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      const random = new Uint32Array(5);
+      const random = new Uint32Array(3);
       crypto.getRandomValues(random);
       return Array.from(random, (value) => alphabet[value % alphabet.length]).join("");
     }
 
+    function normalizeExamCode(value) {
+      return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, "")
+        .slice(0, 3);
+    }
+
     function updateUrl(code, count) {
+      code = normalizeExamCode(code);
       const params = new URLSearchParams(location.search);
       params.set("code", code);
       params.set("count", count);
       params.set("font", $("fontSizeInput").value);
+      params.set("time", getTimeLimit());
       const dataset = findDataset(state.questionFile, state.datasets);
       if (dataset && dataset.id) {
         params.set("bank", dataset.id);
