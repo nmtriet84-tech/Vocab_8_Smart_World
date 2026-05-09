@@ -681,7 +681,7 @@
   <form class="toolbar" id="controlForm">
     <label class="field">
       <span>Mã đề</span>
-      <input id="examCodeInput" maxlength="3" placeholder="Để trống để tự tạo">
+      <input id="examCodeInput" maxlength="4" placeholder="Để trống để tự tạo">
     </label>
     <label class="field">
       <span>Bộ đề</span>
@@ -1271,8 +1271,8 @@
     }
 
     function makeExamCode() {
-      const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-      const random = new Uint32Array(3);
+      const alphabet = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+      const random = new Uint32Array(4);
       crypto.getRandomValues(random);
       return Array.from(random, (value) => alphabet[value % alphabet.length]).join("");
     }
@@ -1281,8 +1281,9 @@
       return String(value || "")
         .trim()
         .toUpperCase()
-        .replace(/[^A-Z0-9]/g, "")
-        .slice(0, 3);
+        .replace(/[O0]/g, "")
+        .replace(/[^A-Z1-9]/g, "")
+        .slice(0, 4);
     }
 
     function updateUrl(code, count) {
